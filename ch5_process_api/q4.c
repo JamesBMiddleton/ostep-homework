@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>  // system calls?
+#include <unistd.h> 
 #include <string.h>
+#include <sys/wait.h>
 
 int main(int argc, char* argv[])
 {
-    int x = 100;
     int rc = fork();
     if (rc < 0)
     {
@@ -13,8 +13,14 @@ int main(int argc, char* argv[])
         exit(1);
     }
     else if (rc == 0)
-        printf("value of x in child process = %d\n", x);
+    {
+        char* args[] = {"ls", NULL}; // first argv is always program name
+        execvp(args[0], args);
+    }
     else
-        printf("value of x in parent process = %d\n", x);
+    {
+        wait(NULL);
+        printf("ls call completed\n");
+    }
     return 0;
 }

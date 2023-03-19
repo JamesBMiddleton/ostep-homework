@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>  // system calls?
+#include <unistd.h>  
 #include <string.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 int main(int argc, char* argv[])
 {
-    int x = 100;
     int rc = fork();
     if (rc < 0)
     {
@@ -13,8 +14,11 @@ int main(int argc, char* argv[])
         exit(1);
     }
     else if (rc == 0)
-        printf("value of x in child process = %d\n", x);
+        printf("hello ");
     else
-        printf("value of x in parent process = %d\n", x);
+    {
+        wait(NULL);
+        printf("world\n");
+    }
     return 0;
 }
