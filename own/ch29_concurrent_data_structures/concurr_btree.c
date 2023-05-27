@@ -11,7 +11,7 @@
 
 
 
-#define NUM_ELEMS 10000
+#define NUM_ELEMS 100000
 #define NUM_THREADS 4
 
 typedef struct __node_t
