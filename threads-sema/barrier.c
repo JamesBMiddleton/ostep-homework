@@ -13,19 +13,30 @@
 // other integers to track things.
 
 typedef struct __barrier_t {
-    // add semaphores and other information here
+    sem_t lock;
+    sem_t s;
+    int num_threads;
+    int max_threads;
 } barrier_t;
 
 
 // the single barrier we are using for this program
 barrier_t b;
 
-void barrier_init(barrier_t *b, int num_threads) {
-    // initialization code goes here
+void barrier_init(barrier_t *b, int max_threads) {
+    sem_init(&b->lock, 0, 1);
+    sem_init(&b->s, 0, 0);
+    b-> num_threads = 0;
+    b-> max_threads = max_threads;
 }
 
 void barrier(barrier_t *b) {
-    // barrier code goes here
+    sem_wait(&b->lock);
+    b->num_threads++;
+    sem_post(&b->lock);
+    if (b->num_threads != b->max_threads)
+        sem_wait(&b->s);
+    sem_post(&b->s);
 }
 
 //
