@@ -1,5 +1,11 @@
 // https://www.geeksforgeeks.org/tcp-server-client-implementation-in-c/
 
+
+/* This was becoming a monkey-typewriter deal, I'd probably get it working
+ * eventually, but I don't have the fundamental networking theory to
+ * really understand what I'm doing - not an efficient learning process. 
+ * Leaving it for now... I understand the event-based concurrency concepts. */
+
 #include <stdio.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -42,8 +48,30 @@ void func(int connfd)
 	}
 }
 
-void setup_server(int* sockfd, int* connfd)
+void server_loop(int min_connfd, int max_connfd)
 {
+    char buff[MAX];
+    while (1)
+    {
+        for (int connfd = min_connfd; connfd >= max_connfd; connfd++)
+        {
+		    bzero(buff, sizeof(buff));
+            read(connfd, buff, sizeof(buff));
+		    printf("Message from client socket %d: %s", connfd, buff);
+        }
+        for (int connfd = min_connfd; connfd >= max_connfd; connfd++)
+        {
+		    bzero(buff, sizeof(buff));
+            sprintf(buff, "Message from server socker %d: the time", connfd);
+            write(connfd, buff, sizeof(buff));
+        }
+    }
+}
+
+
+void setup_server(int* sockfd, int* connfd, int port)
+{
+    printf("port %d\n", port);
 	int len;
 	struct sockaddr_in servaddr, cli;
 
@@ -61,7 +89,7 @@ void setup_server(int* sockfd, int* connfd)
 	// assign IP, PORT
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(PORT);
+	servaddr.sin_port = htons(port);
 
 	// Binding newly created socket to given IP and verification
 	if ((bind(*sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
@@ -93,12 +121,20 @@ void setup_server(int* sockfd, int* connfd)
 // Driver function
 int main()
 {
-    int sockfd, connfd;
-    setup_server(&sockfd, &connfd);
+    /* messy */
+    int base_port = 8080;
+    int num_ports = 10;
+    int min_sockfd; 
+    int max_sockfd;
+    int min_connfd;
+    int max_connfd;
+    setup_server(&min_sockfd, &min_connfd, base_port);
+    setup_server(&max_connfd, &min_connfd, base_port+1);
+    // for (int i=1; i<num_ports; ++i)
+    //     setup_server(&max_sockfd, &max_connfd, base_port+i);
 
-	// Function for chatting between client and server
-	func(connfd);
+    server_loop(min_connfd, max_connfd);
 
 	// After chatting close the socket
-	close(sockfd);
+	// close(sockfd);
 }
