@@ -1,0 +1,8 @@
+  EACCES Where O_CREAT is specified, the protected_fifos or
+              protected_regular sysctl is enabled, the file already
+              exists and is a FIFO or regular file, the owner of the
+              file is neither the current user nor the owner of the
+              containing directory, and the containing directory is both
+              world- or group-writable and sticky.  For details, see the
+              descriptions of /proc/sys/fs/protected_fifos and
+              /proc/sys/fs/protected_regular in proc(5).
